@@ -24,21 +24,27 @@ jobs:
                 with:
                     fetch-depth: 0
 
-            -   id: 'auth'
-                uses: 'google-github-actions/auth@v1'
-                with:
-                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
-                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
-
-            -   name: "Set up Cloud SDK"
-                uses: "google-github-actions/setup-gcloud@v1"
-
-            -   name: Set credentials
-                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
-
-            -   name: remove service
+            -   name: Set Branch name
                 run: |
-                    branch=${{ github.ref_name }}
-                    feature_name=$(echo $branch | cut -d '/' -f 2)
-                    echo "feature_name: $feature_name"
-                    gcloud app services delete $feature_name --quiet
+                    removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
+                    echo "BRANCH: $removed_branch"
+                    echo "::set-env name=BRANCH::$(echo ${removed_branch})"
+
+#            -   id: 'auth'
+#                uses: 'google-github-actions/auth@v1'
+#                with:
+#                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+#                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+#
+#            -   name: "Set up Cloud SDK"
+#                uses: "google-github-actions/setup-gcloud@v1"
+#
+#            -   name: Set credentials
+#                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+
+#            -   name: remove service
+#                run: |
+#                    branch=${{ github.ref_name }}
+#                    feature_name=$(echo $branch | cut -d '/' -f 2)
+#                    echo "feature_name: $feature_name"
+#                    gcloud app services delete $feature_name --quiet
