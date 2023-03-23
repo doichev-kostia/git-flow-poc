@@ -1,7 +1,7 @@
 name: temp-env-deployment
 
 concurrency:
-    group: deploy-feature-${{ github.ref }}
+    group: temp-env-deployment-${{ github.ref }}
     cancel-in-progress: true
 
 on:
