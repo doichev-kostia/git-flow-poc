@@ -14,70 +14,42 @@ jobs:
             contents: 'read'
             id-token: 'write'
         runs-on: ubuntu-latest
+        environment:
+            name: ${{ inputs.appEnv }}
+            url: ${{ inputs.appUrl }}
+        timeout-minutes: 20
         steps:
-            runs-on: ubuntu-latest
-            environment:
-                name: ${{ inputs.appEnv }}
-                url: ${{ inputs.appUrl }}
-            timeout-minutes: 20
-            steps:
-                -   name: Checkout
-                    uses: actions/checkout@v3
-                -   uses: pnpm/action-setup@v2
-                    with:
-                        version: 7.14.2
-                -   name: Use Node.js v16
-                    uses: actions/setup-node@v3
-                    with:
-                        node-version: "16"
-                        cache: "pnpm"
-                -   name: Install dependencies
-                    run: pnpm install
+            -   name: Checkout
+                uses: actions/checkout@v3
+            -   uses: pnpm/action-setup@v2
+                with:
+                    version: 7.14.2
+            -   name: Use Node.js v16
+                uses: actions/setup-node@v3
+                with:
+                    node-version: "16"
+                    cache: "pnpm"
+            -   name: Install dependencies
+                run: pnpm install
 
-                -   name: Build
-                    run: pnpm build
+            -   name: Build
+                run: pnpm build
 
-                -   name: Generate app engine config
-                    run: |
-                        echo "runtime: nodejs18
-                        service: sta-api
-                        instance_class: F2
-                        automatic_scaling:
-                          target_cpu_utilization: 0.85
-                          min_instances: 1
-                          max_instances: 6
-                        inbound_services:
-                        - warmup
-                        env_variables:
-                          NODE_ENV: production
-                          GCLOUD_STORAGE_ROOT: ${{secrets.GCLOUD_STORAGE_ROOT}}
-                          POSTGRES_INSTANCE: ${{secrets.POSTGRES_INSTANCE}}
-                          POSTGRES_USER: ${{secrets.POSTGRES_USER}}
-                          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-                          POSTGRES_DB: ${{secrets.POSTGRES_DB}}
-                          POSTGRES_SSL: ${{secrets.POSTGRES_SSL}}
-                          MAILCHIMP_API_KEY: ${{secrets.MAILCHIMP_API_KEY}}
-                          SOLUTION_ENCRYPTION_KEY: ${{secrets.SOLUTION_ENCRYPTION_KEY}}
-                          OAUTH_GOOGLE_CLIENT_ID: ${{vars.OAUTH_GOOGLE_CLIENT_ID}}
-                          OAUTH_GOOGLE_CLIENT_SECRET: ${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}}
-                          OAUTH_FACEBOOK_CLIENT_ID: ${{vars.OAUTH_FACEBOOK_CLIENT_ID}}
-                          OAUTH_FACEBOOK_CLIENT_SECRET: ${{secrets.OAUTH_FACEBOOK_CLIENT_SECRET}}
-                          NOVU_API_KEY: ${{secrets.NOVU_API_KEY}}
-                          COMMIT_HASH: ${{github.sha}}" > app.yaml 
 
-                -   id: 'auth'
-                    uses: 'google-github-actions/auth@v1'
-                    with:
-                        workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions'
-                        service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
 
-                -   name: "Set up Cloud SDK"
-                    uses: "google-github-actions/setup-gcloud@v1"
-                -   name: Set credentials
-                    run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+            -   id: 'auth'
+                uses: 'google-github-actions/auth@v1'
+                with:
+                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions'
+                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
 
-                -   name: Remove old versions
-                    run: gcloud app versions list --format "value(version.id)" --sort-by "~version.createTime" --service ${{ inputs.serviceId }} | tail -n +6 | xargs -r gcloud app versions delete --quiet
+            -   name: "Set up Cloud SDK"
+                uses: "google-github-actions/setup-gcloud@v1"
+            -   name: Set credentials
+                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
 
-                -   name: Deploy
-                    run: gcloud app deploy ${{ inputs.appEnv }}.yml
+            -   name: Remove old versions
+                run: gcloud app versions list --format "value(version.id)" --sort-by "~version.createTime" --service ${{ inputs.serviceId }} | tail -n +6 | xargs -r gcloud app versions delete --quiet
+
+            -   name: Deploy
+                run: gcloud app deploy ${{ inputs.appEnv }}.yml
