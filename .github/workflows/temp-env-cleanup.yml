@@ -1,7 +1,7 @@
 name: temp-env-cleanup
 
 concurrency:
-    group: deploy-feature-${{ github.ref }}
+    group: temp-env-cleanup-${{ github.ref }}
     cancel-in-progress: true
 
 on:
@@ -37,8 +37,9 @@ jobs:
                 run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
 
             -   name: remove service
+                # removed_branch=refs/heads/major/<feature-name>
                 run: |
-                    branch=${{ github.ref_name }}
-                    feature_name=$(echo $branch | cut -d '/' -f 2)
+                    removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
+                    feature_name=$(echo $removed_branch | cut -d '/' -f 4)
                     echo "feature_name: $feature_name"
                     gcloud app services delete $feature_name --quiet
