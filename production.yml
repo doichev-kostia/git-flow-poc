@@ -3,6 +3,11 @@ runtime: nodejs18
 service: production
 
 handlers:
-    - url: /
-      static_dir: dist
-      secure: always
+    -   url: /
+        static_files: dist/index.html
+        upload: dist/index.html
+
+    -   url: /(.*)
+        static_files: dist/\1
+        upload: dist/(.*)
+
