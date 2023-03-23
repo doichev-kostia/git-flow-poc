@@ -25,8 +25,9 @@ jobs:
                     fetch-depth: 0
 
             -   name: remove service
+                # removed_branch=refs/heads/major/<feature-name>
                 run: |
-                    removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
+                    removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref' | cut -d '/' -f 4)
                     echo "BRANCH: $removed_branch"
 
 #            -   id: 'auth'
