@@ -1,0 +1,73 @@
+name: feature-deployment
+
+concurrency:
+    group: deploy-feature-${{ github.head_ref }}
+    cancel-in-progress: true
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - major/*
+
+jobs:
+    deploy:
+        permissions:
+            contents: 'read'
+            id-token: 'write'
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+
+
+            -   uses: pnpm/action-setup@v2
+                with:
+                    version: 7.14.2
+
+            -   uses: actions/setup-node@v3
+                with:
+                    node-version: "18"
+                    cache: "pnpm"
+
+            -   name: Install dependencies
+                run: pnpm install
+
+            -   name: Build
+                run: pnpm build
+
+            -   name: Generate app engine config
+                run: |
+                    branch=${{ github.ref_name }}
+                    feature_name=$(echo $branch | cut -d '/' -f 2)
+                    echo "feature_name: $feature_name"
+                    
+                    echo "
+                    runtime: nodejs18
+                    service: $feature_name
+                    
+                    handlers:
+                        -   url: /
+                            static_files: dist/index.html
+                            upload: dist/index.html
+                
+                        -   url: /(.*)
+                            static_files: dist/\1
+                            upload: dist/(.*)
+                    " > app.yml
+
+            -   id: 'auth'
+                uses: 'google-github-actions/auth@v1'
+                with:
+                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+
+            -   name: "Set up Cloud SDK"
+                uses: "google-github-actions/setup-gcloud@v1"
+
+            -   name: Set credentials
+                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+
+            -   name: Deploy
+                run: gcloud app deploy app.yml
