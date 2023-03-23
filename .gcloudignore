@@ -1,0 +1,7 @@
+# Use a whitelist approach here as by default we want to ignore *everything*
+*
+
+# and only upload these files
+!/dist/**
+!/production.yml
+!/staging.yml

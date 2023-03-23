@@ -12,7 +12,7 @@ on:
 
 jobs:
     deploy_staging:
-        uses: ./.github/workflows/deploy.yml
+        uses: ./.github/workflows/job_deploy.yml
         with:
             appEnv: production
             appUrl: https://app.myapp.dev
