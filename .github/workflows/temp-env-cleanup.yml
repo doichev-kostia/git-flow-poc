@@ -1,0 +1,40 @@
+name: temp-env-cleanup
+
+concurrency:
+    group: deploy-feature-${{ github.ref }}
+    cancel-in-progress: true
+
+on:
+    workflow_dispatch:
+    delete:
+        branches:
+            - major/*
+            - hotfix/*
+
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   id: 'auth'
+                uses: 'google-github-actions/auth@v1'
+                with:
+                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+
+            -   name: "Set up Cloud SDK"
+                uses: "google-github-actions/setup-gcloud@v1"
+
+            -   name: Set credentials
+                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+
+            -   name: remove service
+                run: |
+                    branch=${{ github.ref_name }}
+                    feature_name=$(echo $branch | cut -d '/' -f 2)
+                    echo "feature_name: $feature_name"
+                    gcloud app services delete $feature_name --quiet

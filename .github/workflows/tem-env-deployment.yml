@@ -1,7 +1,7 @@
-name: feature-deployment
+name: temp-env-deployment
 
 concurrency:
-    group: deploy-feature-${{ github.head_ref }}
+    group: deploy-feature-${{ github.ref }}
     cancel-in-progress: true
 
 on:
@@ -9,6 +9,7 @@ on:
     push:
         branches:
             - major/*
+            - hotfix/*
 
 jobs:
     deploy:
