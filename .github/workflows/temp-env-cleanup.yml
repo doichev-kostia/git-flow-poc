@@ -24,11 +24,10 @@ jobs:
                 with:
                     fetch-depth: 0
 
-            -   name: Set Branch name
+            -   name: remove service
                 run: |
                     removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
                     echo "BRANCH: $removed_branch"
-                    echo "::set-env name=BRANCH::$(echo ${removed_branch})"
 
 #            -   id: 'auth'
 #                uses: 'google-github-actions/auth@v1'
