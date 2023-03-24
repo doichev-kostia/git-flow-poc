@@ -11,7 +11,7 @@ on:
             - published
 
 jobs:
-    deploy_staging:
+    deploy_production:
         uses: ./.github/workflows/job_deploy.yml
         with:
             appEnv: production
