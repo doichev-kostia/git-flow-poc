@@ -6,6 +6,10 @@ concurrency:
 
 on:
     workflow_dispatch:
+      inputs:
+        version:
+          description: 'Version (commit tag)'
+          required: false
     release:
         types:
             - published
@@ -16,3 +20,4 @@ jobs:
         with:
             appEnv: production
             appUrl: https://app.myapp.dev
+            version: ${{ github.event.inputs.version }}

@@ -7,6 +7,9 @@ on:
             appUrl:
                 type: string
                 required: true
+            version:
+                type: string
+                required: false
 
 jobs:
     deploy:
@@ -21,6 +24,9 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v3
+                with:
+                    ref: ${{ github.event.inputs.version || github.ref }}
+
 
             -   uses: pnpm/action-setup@v2
                 with:
