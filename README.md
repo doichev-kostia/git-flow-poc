@@ -48,4 +48,9 @@ When the feature is ready, the developer should create a pull request to master.
 After the pr is merged, the `major/<name>` branch should be deleted, which triggers the deletion of the temp
 environment.
 
+## Rollback to the previous release
+
+In case we need to roll back to the previous release, we should manually trigger a prod deployment workflow
+with the previous release tag.
+![Rollback to the previous release](./public/manual-worflow.png)
 
