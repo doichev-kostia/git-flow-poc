@@ -1,45 +1,56 @@
 name: temp-env-cleanup
 
 concurrency:
-    group: temp-env-cleanup-${{ github.ref }}
-    cancel-in-progress: true
+  group: temp-env-cleanup-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
-    workflow_dispatch:
-    delete:
-        branches:
-            - major/*
-            - hotfix/*
+  workflow_dispatch:
+  delete:
+    branches:
+      - major/*
+      - hotfix/*
 
 jobs:
-    cleanup:
-        permissions:
-            contents: 'read'
-            id-token: 'write'
-        runs-on: ubuntu-latest
-        timeout-minutes: 20
-        steps:
-            -   name: Checkout
-                uses: actions/checkout@v2
-                with:
-                    fetch-depth: 0
+  cleanup:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-            -   id: 'auth'
-                uses: 'google-github-actions/auth@v1'
-                with:
-                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
-                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+      - name: Get branch name
+        run: |
+          branch_name=$(echo ${GITHUB_REF#refs/heads/})
+          echo "branch_name"
+          echo $branch_name
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "event"
+          echo ${{ github.event}}
+          echo ${{ github.event.ref}}
 
-            -   name: "Set up Cloud SDK"
-                uses: "google-github-actions/setup-gcloud@v1"
 
-            -   name: Set credentials
-                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+#      - id: 'auth'
+#        uses: 'google-github-actions/auth@v1'
+#        with:
+#          workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+#          service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
 
-            -   name: remove service
-                # removed_branch=refs/heads/major/<feature-name>
-                run: |
-                    removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
-                    feature_name=$(echo $removed_branch | cut -d '/' -f 4)
-                    echo "feature_name: $feature_name"
-                    gcloud app services delete $feature_name --quiet
+#      - name: "Set up Cloud SDK"
+#        uses: "google-github-actions/setup-gcloud@v1"
+
+#      - name: Set credentials
+#        run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+
+#      - name: remove service
+      # removed_branch=refs/heads/major/<feature-name>
+#       run: |
+#           removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
+#           feature_name=$(echo $removed_branch | cut -d '/' -f 4)
+#           echo "feature_name: $feature_name"
+#           gcloud app services delete $feature_name --quiet
