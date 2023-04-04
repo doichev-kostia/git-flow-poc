@@ -8,11 +8,12 @@ on:
   workflow_dispatch:
   delete:
     branches:
-      - major/*
-      - hotfix/*
+      - 'major/*'
+      - 'hotfix/*'
 
 jobs:
   cleanup:
+    if: ${{ contains(github.event.ref, major/) || contains(github.event.ref, hotfix/) }}
     permissions:
       contents: 'read'
       id-token: 'write'

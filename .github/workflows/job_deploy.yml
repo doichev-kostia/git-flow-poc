@@ -1,63 +1,66 @@
 on:
-    workflow_call:
-        inputs:
-            appEnv:
-                type: string
-                required: true
-            appUrl:
-                type: string
-                required: true
-            version:
-                type: string
-                required: false
+  workflow_call:
+    inputs:
+      appEnv:
+        type: string
+        required: true
+      appUrl:
+        type: string
+        required: true
+      version:
+        type: string
+        required: false
 
 jobs:
-    deploy:
-        permissions:
-            contents: 'read'
-            id-token: 'write'
-        runs-on: ubuntu-latest
-        environment:
-            name: ${{ inputs.appEnv }}
-            url: ${{ inputs.appUrl }}
-        timeout-minutes: 20
-        steps:
-            -   name: Checkout
-                uses: actions/checkout@v3
-                with:
-                    ref: ${{ github.event.inputs.version || github.ref }}
+  deploy:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.appEnv }}
+      url: ${{ inputs.appUrl }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.version || github.ref }}
 
+      # for testing purposes only
+      - name: check
+        run: cat ./src/pages/index.astro
 
-            -   uses: pnpm/action-setup@v2
-                with:
-                    version: 7.14.2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.14.2
 
-            -   uses: actions/setup-node@v3
-                with:
-                    node-version: "18"
-                    cache: "pnpm"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "pnpm"
 
-            -   name: Install dependencies
-                run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-            -   name: Build
-                run: pnpm build
+      - name: Build
+        run: pnpm build
 
-            -   id: 'auth'
-                uses: 'google-github-actions/auth@v1'
-                with:
-                    workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
-                    service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+          service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
 
-            -   name: "Set up Cloud SDK"
-                uses: "google-github-actions/setup-gcloud@v1"
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
 
-            -   name: Set credentials
-                run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+      - name: Set credentials
+        run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
 
-            -   name: Deploy
-                run: gcloud app deploy ${{ inputs.appEnv }}.yml
+      - name: Deploy
+        run: gcloud app deploy ${{ inputs.appEnv }}.yml
 
-            -   name: Remove old versions
-                run: gcloud app versions list --format "value(version.id)" --sort-by "~version.createTime" --service ${{ inputs.serviceId }} | tail -n +6 | xargs -r gcloud app versions delete --quiet
+      - name: Remove old versions
+        run: gcloud app versions list --format "value(version.id)" --sort-by "~version.createTime" --service ${{ inputs.serviceId }} | tail -n +6 | xargs -r gcloud app versions delete --quiet
 
