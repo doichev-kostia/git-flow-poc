@@ -24,33 +24,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get branch name
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
+          service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
+
+      - name: Set credentials
+        run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+
+      - name: remove service
+        # github.event.ref: major/<feature-name>
         run: |
-          branch_name=$(echo ${GITHUB_REF#refs/heads/})
-          echo "branch_name"
-          echo $branch_name
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "event"
-          echo ${{ github.event}}
-          echo ${{ github.event.ref}}
-
-
-#      - id: 'auth'
-#        uses: 'google-github-actions/auth@v1'
-#        with:
-#          workload_identity_provider: 'projects/950836167777/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider'
-#          service_account: 'deployer@git-flow-poc.iam.gserviceaccount.com'
-
-#      - name: "Set up Cloud SDK"
-#        uses: "google-github-actions/setup-gcloud@v1"
-
-#      - name: Set credentials
-#        run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
-
-#      - name: remove service
-      # removed_branch=refs/heads/major/<feature-name>
-#       run: |
-#           removed_branch=$(cat ${{ github.event_path }} | jq --raw-output '.ref')
-#           feature_name=$(echo $removed_branch | cut -d '/' -f 4)
-#           echo "feature_name: $feature_name"
-#           gcloud app services delete $feature_name --quiet
+          temp_env_name=$(echo ${{ github.event.ref }} | cut -d '/' -f 2)
+          echo "temp_env_name: $temp_env_name"
+          gcloud app services delete $temp_env_name --quiet
