@@ -27,6 +27,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.version || github.ref }}
 
+      # for testing purposes only
       - name: check
         run: cat ./src/pages/index.astro
 
