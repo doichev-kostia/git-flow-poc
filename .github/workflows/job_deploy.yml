@@ -52,14 +52,15 @@ jobs:
             service_id: ${{ inputs.service_id }}
 
       - name: logs
-        shell: bash
         run: |
-          echo'
+          echo "
             wid: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
             service: ${{ secrets.SERVICE_ACCOUNT }}
-          ' > logs.txt
+          " > logs.txt
+          
           cat logs.txt
-          if [[ -z "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}" ]]; then
+          
+           if [[ -z "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}" ]]; then
             echo "WORKLOAD_IDENTITY_PROVIDER is not set"
             exit 1
           fi
