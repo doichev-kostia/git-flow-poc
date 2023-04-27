@@ -1,0 +1,33 @@
+name: temp-env-cleanup
+
+concurrency:
+  group: temp-env-cleanup-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  delete:
+    branches:
+      - 'major/*'
+      - 'hotfix/*'
+
+jobs:
+  cleanup:
+    if: ${{ contains(github.event.ref, 'major/') || contains(github.event.ref, 'hotfix/') }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Cleanup
+        uses: Panenco/git-flow/cleanup@master
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          delimiter: '-'

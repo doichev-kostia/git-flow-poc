@@ -1,0 +1,24 @@
+name: production-deployment
+
+concurrency:
+    group: deploy-production
+    cancel-in-progress: true
+
+on:
+    workflow_dispatch:
+      inputs:
+        version:
+          description: 'Version (commit tag)'
+          required: false
+    release:
+        types:
+            - published
+
+jobs:
+    deploy_production:
+        uses: ./.github/workflows/job_deploy.yml
+        with:
+            env: production
+            url: https://app.myapp.dev
+            version: ${{ github.event.inputs.version }}
+            service_id: production

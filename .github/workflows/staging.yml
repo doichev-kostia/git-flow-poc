@@ -14,5 +14,6 @@ jobs:
     deploy_staging:
         uses: ./.github/workflows/job_deploy.yml
         with:
-            appEnv: staging
-            appUrl: https://staging.myapp.dev
+          env: staging
+          url: https://staging.myapp.dev
+          service_id: staging

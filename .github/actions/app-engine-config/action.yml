@@ -1,0 +1,29 @@
+name: "Create app engine config"
+description: "Create app engine config"
+inputs:
+  service_id:
+    description: 'The service id to be used for app engine config'
+    required: true
+  filename:
+    description: 'The name of the config file'
+    required: true
+
+runs:
+    using: 'composite'
+    steps:
+      - name: create config file
+        uses: bash
+        run: |
+          echo "
+          runtime: nodejs18
+          service: ${{ inputs.service_id }}
+
+          handlers:
+              -   url: /
+                  static_files: dist/index.html
+                  upload: dist/index.html
+
+              -   url: /(.*)
+                  static_files: dist/\1
+                  upload: dist/(.*)
+          " > ${{ inputs.filename }}
