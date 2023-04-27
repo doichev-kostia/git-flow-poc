@@ -12,7 +12,7 @@ runs:
     using: 'composite'
     steps:
       - name: create config file
-        uses: bash
+        shell: bash
         run: |
           echo "
           runtime: nodejs18
