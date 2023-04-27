@@ -46,7 +46,7 @@ jobs:
         run: pnpm build
 
       - name: Generate app engine config
-        uses: ./.github/actions/generate-app-engine-config
+        uses: ./.github/actions/app-engine-config
         with:
             filename: ${{ inputs.env }}.yml
             service_id: ${{ inputs.service_id }}
