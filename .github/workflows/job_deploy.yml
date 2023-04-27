@@ -51,11 +51,29 @@ jobs:
             filename: ${{ inputs.env }}.yml
             service_id: ${{ inputs.service_id }}
 
+      - name: logs
+        shell: bash
+        run: |
+          echo'
+            wid: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+            service: ${{ secrets.SERVICE_ACCOUNT }}
+          ' > logs.txt
+          cat logs.txt
+          if [[ -z "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}" ]]; then
+            echo "WORKLOAD_IDENTITY_PROVIDER is not set"
+            exit 1
+          fi
+          
+          if [[ -z "${{ secrets.SERVICE_ACCOUNT }}" ]]; then
+              echo "SERVICE_ACCOUNT is not set"
+              exit 1
+          fi
+
       - name: Deploy to app engine
         uses: Panenco/gcp-deploy-action@v2
         with:
           workload_identity_provider: projects/12345/locations/global/workloadIdentityPools/github-actions/providers/deployment-provider
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          service_account: secret@secret.com
           service_id: ${{ inputs.service_id }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           app_yaml_path: ${{ inputs.env }}.yml
