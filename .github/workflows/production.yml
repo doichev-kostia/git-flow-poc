@@ -22,3 +22,7 @@ jobs:
             url: https://app.myapp.dev
             version: ${{ github.event.inputs.version }}
             service_id: production
+        secrets:
+          WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
