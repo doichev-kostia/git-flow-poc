@@ -54,5 +54,11 @@ In case we need to roll back to the previous release, we should manually trigger
 with the previous release tag.
 ![Rollback to the previous release](./public/manual-worflow.png)
 
+## Secrets and variables
+
+- `WORKLOAD_IDENTITY_PROVIDER` - GCP workload identity provider should be stored in secrets
+- `SERVICE_ACCOUNT` - GCP service account should be stored in secrets
+- `GCP_PROJECT_ID` - GCP project id should be stored in variables `${{ vars.GCP_PROJECT_ID }}` otherwise GitHub actions
+  will mask the temporary environment URL
 
 
