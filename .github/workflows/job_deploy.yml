@@ -64,5 +64,5 @@ jobs:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           service_id: ${{ inputs.service_id }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
           app_yaml_path: ${{ inputs.env }}.yml
