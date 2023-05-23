@@ -1,5 +1,5 @@
 name: "Create app engine config"
-description: "Create app engine config"
+description: "Create app engine config file. This file can be different depending on your project."
 inputs:
   service_id:
     description: 'The service id to be used for app engine config'

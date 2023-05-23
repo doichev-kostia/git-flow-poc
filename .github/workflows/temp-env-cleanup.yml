@@ -6,10 +6,8 @@ concurrency:
 
 on:
   workflow_dispatch:
+  # unfortunately, branch filters are not working for delete events
   delete:
-    branches:
-      - 'major/*'
-      - 'hotfix/*'
 
 jobs:
   cleanup:

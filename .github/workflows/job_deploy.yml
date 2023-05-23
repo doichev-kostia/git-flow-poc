@@ -1,21 +1,27 @@
 on:
   workflow_call:
     inputs:
+      # the environment name that will be used for the deployment
       env:
         type: string
         required: true
+      # the environment url
       url:
         type: string
         required: true
+      # version of the app to deploy, if not specified, the ref will be used
       version:
         type: string
         required: false
+      # Google Cloud App Engine service id that will be used for the deployment
       service_id:
         type: string
         required: true
     secrets:
+        # 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
         WORKLOAD_IDENTITY_PROVIDER:
             required: true
+        # 'my-service-account@my-project.iam.gserviceaccount.com'
         SERVICE_ACCOUNT:
             required: true
         GCP_PROJECT_ID:
@@ -39,7 +45,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.14.2
+          version: 8.5.1
 
       - uses: actions/setup-node@v3
         with:
