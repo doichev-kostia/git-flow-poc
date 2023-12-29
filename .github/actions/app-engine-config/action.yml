@@ -1,5 +1,5 @@
 name: "Create app engine config"
-description: "Create app engine config file. This file can be different depending on your project."
+description: "Create app engine config"
 inputs:
   service_id:
     description: 'The service id to be used for app engine config'
@@ -9,21 +9,11 @@ inputs:
     required: true
 
 runs:
-    using: 'composite'
-    steps:
-      - name: create config file
-        shell: bash
-        run: |
-          echo "
-          runtime: nodejs18
-          service: ${{ inputs.service_id }}
-
-          handlers:
-              -   url: /
-                  static_files: dist/index.html
-                  upload: dist/index.html
-
-              -   url: /(.*)
-                  static_files: dist/\1
-                  upload: dist/(.*)
-          " > ${{ inputs.filename }}
+  using: 'composite'
+  steps:
+    - name: create config file
+      shell: bash
+      run: ./.github/actions/app-engine-config/generate-config.sh
+      env:
+        service_name: ${{ inputs.service_id }}
+        filename: ${{ inputs.filename }}

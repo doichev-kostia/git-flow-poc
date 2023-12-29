@@ -18,14 +18,14 @@ on:
         type: string
         required: true
     secrets:
-        # 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
-        WORKLOAD_IDENTITY_PROVIDER:
-            required: true
-        # 'my-service-account@my-project.iam.gserviceaccount.com'
-        SERVICE_ACCOUNT:
-            required: true
-        GCP_PROJECT_ID:
-          required: true
+      # 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+      WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      # 'my-service-account@my-project.iam.gserviceaccount.com'
+      SERVICE_ACCOUNT:
+        required: true
+      GCP_PROJECT_ID:
+        required: true
 
 jobs:
   deploy:
@@ -61,8 +61,8 @@ jobs:
       - name: Generate app engine config
         uses: ./.github/actions/app-engine-config
         with:
-            filename: ${{ inputs.env }}.yml
-            service_id: ${{ inputs.service_id }}
+          filename: ${{ inputs.env }}.yml
+          service_id: ${{ inputs.service_id }}
 
       - name: Deploy to app engine
         uses: Panenco/gcp-deploy-action@v2
