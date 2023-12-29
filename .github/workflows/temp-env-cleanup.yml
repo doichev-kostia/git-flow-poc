@@ -1,7 +1,7 @@
 name: temp-env-cleanup
 
 concurrency:
-  group: temp-env-cleanup-${{ github.ref }}
+  group: temp-env-cleanup-${{ github.event.ref }}
   cancel-in-progress: true
 
 on:
