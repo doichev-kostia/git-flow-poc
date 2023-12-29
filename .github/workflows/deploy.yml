@@ -39,24 +39,22 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.version || github.ref }}
 
       - uses: pnpm/action-setup@v2
-        with:
-          version: 8.5.1
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: "18"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: pnpm run build
 
       - name: Generate app engine config
         uses: ./.github/actions/app-engine-config
