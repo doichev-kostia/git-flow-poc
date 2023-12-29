@@ -16,7 +16,7 @@ on:
 
 jobs:
     deploy_production:
-        uses: ./.github/workflows/job_deploy.yml
+        uses: ./.github/workflows/deploy.yml
         with:
             env: production
             url: https://app.myapp.dev
